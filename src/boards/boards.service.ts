@@ -37,6 +37,15 @@ export class BoardsService {
         this.boards.push(board); //위의 받아온 데이터들로 board 객체를 만들었고 이것을 push 하다
         return board;
     }
+
+    //특정 번호의 게시글 일부 수정
+    updateBoardStatusById(id:number, status: BoardStatus): Board{
+        const foundBoard = this.getBoardDetailById(id);
+        foundBoard.stauts = status;
+        return foundBoard;
+    }
+
+    //게시글 삭제 기능
     deleteBoardId(id: number): void{
         this.boards = this.boards.filter((board)=> board.id != id);
     }
