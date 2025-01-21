@@ -37,5 +37,8 @@ export class BoardsService {
         this.boards.push(board); //위의 받아온 데이터들로 board 객체를 만들었고 이것을 push 하다
         return board;
     }
+    deleteBoardId(id: number): void{
+        this.boards = this.boards.filter((board)=> board.id != id);
+    }
 }
 

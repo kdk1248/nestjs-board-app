@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
 import { BoardsService } from './boards.service';
 import { Board } from './boards.entity';
 import { CreateBoardDto } from './dto/create-board.dto';
@@ -28,5 +28,10 @@ export class BoardsController {
     @Post('/')
     createBoard(@Body() createBoardDto: CreateBoardDto)  {
         return this.boardService.createBoard(createBoardDto)
+    }
+    //게시글 삭제 기능
+    @Delete('/:id')
+    deleteBoardId(@Param('id') id: number): void {
+        this.boardService.deleteBoardId(id);
     }
 }
