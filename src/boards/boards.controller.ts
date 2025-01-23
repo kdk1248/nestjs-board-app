@@ -5,6 +5,7 @@ import { CreateBoardDto } from './dto/create-board.dto';
 import { BoardStatus } from './boards-status.enum';
 import { UpdateBoardDto } from './dto/update-board.dto';
 import { BoardStatusValidationPipe } from './pipes/board-stauts-validation.pipe';
+import { BoardResponseDto } from './dto/board-response.dto';
 
 @Controller('api/boards')
 @UsePipes(ValidationPipe)
@@ -14,8 +15,10 @@ export class BoardsController {
 
     // 게시글 조회 기능
     @Get('/')
-    async getAllBoards(): Promise<Board[]> {
-        return await this.boardsService.getAllBoards(); // 비동기적으로 게시글 가져오기
+    async getAllBoards(): Promise<BoardResponseDto[]> {
+        const boards:Board[]= await this.boardsService.getAllBoards(); // 비동기적으로 게시글 가져오기
+        const boardsResposeDto = boards.map(board => new BoardResponseDto(board))
+        return boardsResposeDto;
     }
 
 //     // 특정 게시글 조회 기능
@@ -30,12 +33,12 @@ export class BoardsController {
 //         return this.boardsService.getBoardsByKeyword(author);
 //     }
 
-//     // 게시글 작성 기능
-//     @Post('/')
-//     createBoard(
-//         @Body() createboardDto: CreateBoardDto) {
-//         return this.boardsService.createBoard(createboardDto);
-//     }
+    // 게시글 작성 기능
+    @Post('/')
+    async createBoard(
+        @Body() createboardDto: CreateBoardDto): Promise<string> {
+        return this.boardsService.createBoard(createboardDto);
+    }
 
 //     // 특정 번호의 게시글 수정
 //     @Put('/:id')
