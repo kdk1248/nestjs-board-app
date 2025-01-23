@@ -31,31 +31,26 @@ export class BoardsService {
     //    if(foundBoardKw.length === 0){
     //         throw new NotFoundException(`Board with Keywod ${author} not found`); 
     //    } 
-    //    return foundBoardKw;
+    //    return foundBoards;
     // }
 
-    // // 게시글 작성 기능
-    // createBoard(createboardDto: CreateBoardDto) {   //특수문자 x
-    //     const {author, title, contents} = createboardDto;
-        
-    //     // 특수문자 검사 정규 표현식  
-    //     const specialCharRegex = /[!@#$%^&*(),.?":{}|<>]/;  
+    // 게시글 작성 기능
+    async createBoard(createboardDto: CreateBoardDto): Promise<string> {   //특수문자 x
+        const {author, title, contents} = createboardDto;
+        if(!author || !title || !contents){
+            throw new BadRequestException('Author, title, and contents musst be provided')
+        }
+        const board: Board = {
+            id:0, //임시 초기화
+            author, // author: createBoardDto.author
+            title,
+            contents,
+            status: BoardStatus.PUBLIC
+        }
 
-    //     // 예외 처리: 작성자에만 특수문자가 포함되어 있는지 확인  
-    //     if (specialCharRegex.test(author)) {  
-    //         throw new BadRequestException('Author must not contain special characters');  
-    //     }  
-    //     const board: Board = {
-    //         id: this.boards.length + 1, // 임시 Auto Increament 기능
-    //         author,
-    //         title,
-    //         contents,
-    //         status: BoardStatus.PUBLIC
-    //     }
-
-    //     this.boards.push(board);   
-    //     return board; 
-    // }
+        const createBoard = await this.boardsRepository.saveBoard(board);   
+        return createBoard; 
+    }
 
     // // 게시글 삭제 기능  
     // deleteBoardById(id: number): void {  
