@@ -23,4 +23,23 @@ export class BoardsRepository{
             throw new InternalServerErrorException('Database query failed', err);
         }
     }
+
+    async saveBoard(board: Board): Promise<string> {
+        const insertQuery = 'INSERT INTO board (author, title, contents, status) VALUES (?, ?, ?, ?)';
+        
+        try {
+            const [result] = await this.connectionPool.query(insertQuery, [board.author, board.title, board.contents, board.status]);
+    
+            // 성공 메시지를 반환
+            const message = 'Created successfully!';
+            return message;
+        } catch (err) {
+            // 오류를 처리하고 예외를 던짐
+            throw new InternalServerErrorException('Database query failed', err);
+        }
+    }
+    
+
+    
+       
 }
