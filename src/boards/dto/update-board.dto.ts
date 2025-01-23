@@ -1,4 +1,11 @@
-export class UpdateBoardDto{
+import { IsNotEmpty, IsString } from "class-validator";
+
+export class UpdateBoardDto {
+    @IsNotEmpty()
+    @IsString()
     title: string;
-    contents:string;
+
+    @IsNotEmpty()
+    @IsString()
+    contents: string;
 }
