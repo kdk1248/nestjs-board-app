@@ -7,7 +7,7 @@ export const databaseConfig = ({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PW,
-    port: process.env.DB_PORT,
+    port: +process.env.DB_PORT, // +, Number 를 작성해줘야 한다
     database: process.env.DB_NAME,
     connectionLimit: 10, // 최대 연결 수 설정
     insecureAuth: true,
