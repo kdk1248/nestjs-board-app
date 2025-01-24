@@ -54,7 +54,7 @@ export class BoardsController {
     }
 
     // 특정 번호의 게시글 일부 수정
-    @Patch('/:id')
+    @Patch('/:id/status')
     async updateBoardStatusById(
         @Param('id') id: number,
         @Body('status', BoardStatusValidationPipe) status: BoardStatus): Promise<void> {
