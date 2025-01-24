@@ -1,100 +1,92 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Board } from './boards.entity';
 import { BoardStatus } from './boards-status.enum';
 import { CreateBoardDto } from './dto/create-board.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { UpdateBoardDto } from './dto/update-board.dto';
 
-@Injectable() 
+@Injectable()
 export class BoardsService {
     //Repository 계층 DI 
     constructor(
         @InjectRepository(Board)
         private boardsRepository: Repository<Board>
-    ){}
+    ) { }
 
     // 게시글 조회 기능  
-    async getAllBoards(): Promise<Board[]> {  
-        const foundBoards = await this.boardsRepository.findAll(); 
+    async getAllBoards(): Promise<Board[]> {
+        const foundBoards = await this.boardsRepository.find();
         return foundBoards; // foundBoards 반환  
     }
 
     // // 특정 게시글 조회 기능
-    // getBoardDetailById(id: number): Board{
-    //     const foundBoardId = this.boards.find((board) => board.id == id);
-    //     if(!foundBoardId) {
-    //         throw new NotFoundException(`Board with ID ${id} not found`);
-    //     }
-    //     return foundBoardId;
-    // }
+    async getBoardDetailById(id: number): Promise<Board> {
+        const foundBoard = await this.boardsRepository.findOneBy({ id: id }); // await 추가
+        if (!foundBoard) {
+            throw new NotFoundException(`Board with ID ${id} not found`);
+        }
+        return foundBoard;
+    }    
 
     // //키워드(작성자)로 검색한 게시글 조회 기능
-    // getBoardsByKeyword(author: string): Board[] {
-    //    const foundBoardKw = this.boards.filter((board) => board.author === author);
-    //    if(foundBoardKw.length === 0){
-    //         throw new NotFoundException(`Board with Keywod ${author} not found`); 
-    //    } 
-    //    return foundBoards;
-    // }
+    async getBoardsByKeyword(author: string): Promise<Board[]> {
+        if (!author) {
+            throw new BadRequestException('AUthor keyword must be provided')
+        }
+        const foundBoards = this.boardsRepository.findBy({ author: author })
+
+        if ((await foundBoards).length === 0) {
+            throw new NotFoundException(`No boards found for author: ${author}`)
+        }
+        return foundBoards;
+    }
 
     // 게시글 작성 기능
-    async createBoard(createboardDto: CreateBoardDto): Promise<string> {   //특수문자 x
-        const {author, title, contents} = createboardDto;
-        if(!author || !title || !contents){
+    async createBoard(createboardDto: CreateBoardDto): Promise<Board> {   //특수문자 x
+        const { author, title, contents } = createboardDto;
+        if (!author || !title || !contents) {
             throw new BadRequestException('Author, title, and contents musst be provided')
         }
-        const board: Board = {
-            id:0, //임시 초기화
+        const newboard: Board = {
+            id: 0, //임시 초기화
             author, // author: createBoardDto.author
             title,
             contents,
             status: BoardStatus.PUBLIC
-        }
+        };
 
-        const createBoard = await this.boardsRepository.saveBoard(board);   
-        return createBoard; 
+        const createBoard = await this.boardsRepository.save(newboard);
+        return createBoard;
     }
 
+    // 특정 번호의 게시글 수정
+    async updateBoardById(id: number, updateBoardDto: UpdateBoardDto): Promise<Board> {
+        const foundBoard = await this.getBoardDetailById(id);
+        const { title, contents } = updateBoardDto;
+
+        if (!title || !contents) {
+            throw new BadRequestException('Title and contents must be provided');
+        }
+        foundBoard.title = title;
+        foundBoard.contents = contents;
+
+        const updateBoard = await this.boardsRepository.save(foundBoard)
+        return updateBoard;
+
+    }
+    // 특정 번호의 게시글 일부 수정  
+    async updateBoardStatusById(id: number, status: BoardStatus): Promise<void> {  
+        const result = await this.boardsRepository.update(id, {status});  
+        if (result.affected === 0){  
+            throw new BadRequestException(`Board with ID ${id} Not Found`);  
+        }
+    }   
+
     // // 게시글 삭제 기능  
-    // deleteBoardById(id: number): void {  
-    //     // 게시글이 존재하는지 확인  
-    //     const boardExists = this.boards.some((board) => board.id === id);  
-    //     if (!boardExists) {  
-    //         throw new NotFoundException(`Board with ID ${id} not found`);  
-    //     }   
-    //     this.boards = this.boards.filter((board) => board.id !== id);  
-    // } 
+    async deleteBoardById(id: number): Promise<void> {  
+        const foundBoard = await this.getBoardDetailById(id);
+        await this.boardsRepository.delete(foundBoard);  
+    } 
 
-    // // // 특정 번호의 게시글 일부 수정  
-    // // updateBoardStatusById(id: number, status: BoardStatus): Board {  
-    // //     const foundBoard = this.getBoardDetailById(id);  
-
-    // //     // 예외 처리: 현재 상태가 PUBLIC일 때는 PUBLIC으로, PRIVATE일 때는 PRIVATE으로 변경할 수 없음  
-    // //     if (foundBoard.status === BoardStatus.PUBLIC && status === BoardStatus.PUBLIC) {  
-    // //         throw new BadRequestException('Cannot change status from PUBLIC to PUBLIC');  
-    // //     }  
-
-    // //     if (foundBoard.status === BoardStatus.PRIVATE && status === BoardStatus.PRIVATE) {  
-    // //         throw new BadRequestException('Cannot change status from PRIVATE to PRIVATE');  
-    // //     }  
-
-    // //     foundBoard.status = status;   
-    //     return foundBoard;  
-    // }  
-
-    // // 특정 번호의 게시글 수정
-    // updateBoardById(id: number, updateBoardDto: UpdateBoardDto): Board{  
-    //     const foundBoard = this.getBoardDetailById(id);
-    //     const {title, contents} = updateBoardDto;
-
-    //     if(!title || !contents){
-    //         throw new BadRequestException('Title and contents must be provided');
-    //     }
-    //     foundBoard.title = title;
-    //     foundBoard.contents = contents;
-
-    //     return foundBoard;
-
-    // }
-    
 }
