@@ -1,10 +1,11 @@
-import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/users.entity';
 import { Repository } from 'typeorm';
 import { UserRole } from './users-role.enum';
-import * as bcrypt from 'bcryptjs'; 
+import * as bcrypt from 'bcryptjs';
+import { LoginUserDto } from './dto/login-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -19,6 +20,7 @@ export class AuthService {
     if (!email || !username || !password! || role) {
       throw new BadRequestException('Something went wrong.') //특정 필드 언급하지않도록 -> 보안의 중요성성
     }
+
     await this.checkEmailExist(email);
 
     // 비밀번호 해싱
@@ -35,11 +37,33 @@ export class AuthService {
     return createUser;
   }
 
-  async checkEmailExist(email: string): Promise<void> {
-    const exisitngUser = await this.userRepository.findOne({ where: { email } })
-    if (exisitngUser) {
-      throw new ConflictException('Email already exists');
+  //로그인 기능
+  async signIn(loginUserDto: LoginUserDto): Promise<string> {
+    const { email, password } = loginUserDto;
+    
+    const existingUser = await this.checkEmailExist(email);
+
+    if (!existingUser || !(await bcrypt.compare(password, existingUser.password))) {
+      throw new UnauthorizedException('Invalid credentials');
     }
+    const message = 'Login success';
+    return message;
+
+  }
+
+  async findUserByEmail(email: string): Promise<User>{
+    const exisitngUser = await this.userRepository.findOne({where: {email}});
+    if(!exisitngUser){
+      throw new NotFoundException('User not found');
+    }
+    return exisitngUser;
+  }
+  
+  async checkEmailExist(email: string): Promise<User> {
+    const exisitngUser = await this.userRepository.findOne({ where: { email } })
+    if (!exisitngUser) {
+      throw new ConflictException('Email already exists');
+    } return exisitngUser;
   }
 
   async hashPassword(password: string): Promise<string> {
