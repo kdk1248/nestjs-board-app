@@ -39,8 +39,9 @@ export class AuthController {
   }
   @Post('/test')
   @UseGuards(AuthGuard('jwt')) //@UseGuards 는 해당 인증 가드가 적용되, AuthGuard는 인증가드가 어떤 전략을 사용할지 결정
-  testForAuth(@Req() req:Request) {
-    console.log(req.user); //인증된 사용자의 정보 출력력
-    return { message: 'You are authenticated', user: req.user };
+  testForAuth(@GetUser () logginedUser:User) {
+    console.log(logginedUser); //인증된 사용자의 정보 출력력
+    console.log(logginedUser.id);
+    return { message: 'You are authenticated', user: logginedUser };
   }
 }
