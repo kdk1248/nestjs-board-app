@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Post, Query, Patch, Put, UsePipes, ValidationPipe, Body, Delete } from '@nestjs/common';
+import { Controller, Get, Param, Post, Query, Patch, Put, UsePipes, ValidationPipe, Body, Delete, UseGuards } from '@nestjs/common';
 import { BoardsService } from './boards.service';
 import { Board } from './boards.entity';
 import { BoardResponseDto } from './dto/board-response.dto';
@@ -7,15 +7,20 @@ import { UpdateBoardDto } from './dto/update-board.dto';
 import { BoardSearchResponseDto } from './dto/board-search-response.dto';
 import { BoardStatusValidationPipe } from './pipes/board-stauts-validation.pipe';
 import { BoardStatus } from './boards-status.enum';
+import { AuthGuard } from '@nestjs/passport';
+import { RolesGuard } from 'src/auth/custom-role.guard';
+import { Roles } from 'src/auth/roles.decorator';
+import { UserRole } from 'src/auth/users-role.enum';
 
 @Controller('api/boards')
-@UsePipes(ValidationPipe)
+@UseGuards(AuthGuard(), RolesGuard) //로그인 유저가 USER 만 접근 가능능
 export class BoardsController {
     // 생성자 주입
     constructor(private boardsService: BoardsService) { }
 
     // 게시글 조회 기능
     @Get('/')
+    @Roles(UserRole.USER)
     async getAllBoards(): Promise<BoardResponseDto[]> {
         const boards: Board[] = await this.boardsService.getAllBoards(); // 비동기적으로 게시글 가져오기
         const boardResponseDto = boards.map(board => new BoardResponseDto(board))
@@ -46,7 +51,7 @@ export class BoardsController {
 
     // 특정 번호의 게시글 수정
     @Put('/:id')
-    async updateBoardById(
+    async updateBoardById( 
         @Param('id') id: number,
         @Body() updateBoardDto: UpdateBoardDto,): Promise<BoardResponseDto> {
         const updatedBoard = await this.boardsService.updateBoardById(id, updateBoardDto);
