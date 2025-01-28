@@ -1,14 +1,18 @@
-import { Controller, Post, Body, Res } from '@nestjs/common';
+import { Controller, Post, Body, Res, Req, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UserResponseDto } from './dto/user-response.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
-import { Response } from 'express'; 
-import { log } from 'console';
+import { Response ,Request} from 'express';
+import { AuthGuard } from '@nestjs/passport';
+import { User } from './entities/users.entity';
+import { GetUser } from './get-user.decorator';
 
 @Controller('api/auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService
+  ) { }
 
   // 회원 가입 기능
   @Post('/signup')
@@ -22,8 +26,8 @@ export class AuthController {
   // 로그인 기능
   @Post('/signin')
   async signin(@Body() loginUserDto: LoginUserDto, @Res() res: Response): Promise<void> {
-    const accessToken = await this.authService.signIn(loginUserDto,res);
-    
+    const accessToken = await this.authService.signIn(loginUserDto, res);
+
     // [2] JWT를 쿠키에 저장
     res.cookie('Authorization', accessToken, {
       httpOnly: true,
@@ -32,5 +36,11 @@ export class AuthController {
       sameSite: 'none'
     });
     res.send({ message: "Login Success" });
+  }
+  @Post('/test')
+  @UseGuards(AuthGuard('jwt')) //@UseGuards 는 해당 인증 가드가 적용되, AuthGuard는 인증가드가 어떤 전략을 사용할지 결정
+  testForAuth(@Req() req:Request) {
+    console.log(req.user); //인증된 사용자의 정보 출력력
+    return { message: 'You are authenticated', user: req.user };
   }
 }
