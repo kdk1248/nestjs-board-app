@@ -34,7 +34,8 @@ export class AuthService {
       email,
       username,
       password,
-      role: UserRole.USER
+      role: UserRole.USER,
+      boards:[]
     };
     const createUser = await this.userRepository.save(newUser);
     return createUser;
