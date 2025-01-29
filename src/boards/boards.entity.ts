@@ -19,6 +19,6 @@ export class Board {
     @Column()
     status: BoardStatus;
 
-    @ManyToOne(Type => User, user=>user.boards ,{eager: false})
+    @ManyToOne(Type => User, user=>user.boards ,{eager: true}) // == lazy loading 상태태
     user:User;
 }
