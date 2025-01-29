@@ -15,16 +15,23 @@ import { GetUser } from 'src/auth/get-user.decorator';
 import { User } from 'src/auth/entities/users.entity';
 
 @Controller('api/boards')
-@UseGuards(AuthGuard(), RolesGuard) //로그인 유저가 USER 만 접근 가능능
+@UseGuards(AuthGuard(), RolesGuard) 
 export class BoardsController {
     // 생성자 주입
     constructor(private boardsService: BoardsService) { }
 
     // 게시글 조회 기능
     @Get('/')
-    @Roles(UserRole.USER)
+    @Roles(UserRole.USER)//로그인 유저가 USER 만 접근 가능 
     async getAllBoards(): Promise<BoardResponseDto[]> {
         const boards: Board[] = await this.boardsService.getAllBoards(); // 비동기적으로 게시글 가져오기
+        const boardResponseDto = boards.map(board => new BoardResponseDto(board))
+        return boardResponseDto;
+    }
+    //나의 게시글 조회 기능(로그인 유지지)
+    @Get('/myboards')
+    async getMyAllBoards(@GetUser() logginedUser:User): Promise<BoardResponseDto[]> {
+        const boards: Board[] = await this.boardsService.getMyAllBoards(logginedUser); // 비동기적으로 게시글 가져오기
         const boardResponseDto = boards.map(board => new BoardResponseDto(board))
         return boardResponseDto;
     }
