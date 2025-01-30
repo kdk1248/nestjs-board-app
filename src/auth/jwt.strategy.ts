@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { Injectable, Logger, UnauthorizedException } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
 import { InjectRepository } from "@nestjs/typeorm";
 import { ExtractJwt, Strategy } from "passport-jwt";
@@ -11,6 +11,8 @@ import { Request } from 'express';
 dotenv.config();
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy){
+    private readonly logger = new Logger(JwtStrategy.name);
+    
     constructor(
         @InjectRepository(User)
         private userRepository: Repository<User>,
@@ -26,8 +28,10 @@ export class JwtStrategy extends PassportStrategy(Strategy){
     async validate(payload){
         const { email } = payload;
 
-        const user: User = await this.userRepository.findOne({where: {email}});
+        const user: User = await this.userRepository.findOneBy({email});
+        
         if(!user){
+            this.logger.error(`User not found or Internal Server Error`);
             throw new UnauthorizedException();
         }
         return user;
