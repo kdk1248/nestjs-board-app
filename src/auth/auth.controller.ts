@@ -1,12 +1,10 @@
-import { Controller, Post, Body, Res, Req, UseGuards, Logger } from '@nestjs/common';
+import { Controller, Post, Body, Res, Logger } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UserResponseDto } from './dto/user-response.dto';
-import { CreateUserDto } from './dto/create-user.dto';
-import { LoginUserDto } from './dto/login-user.dto';
-import { Response ,Request} from 'express';
-import { AuthGuard } from '@nestjs/passport';
-import { User } from './entities/users.entity';
-import { GetUser } from './get-user.decorator';
+import { SignUpRequestDto } from './dto/sign-up-request.dto';
+import { SignInRequestDto } from './dto/sign-in-request.dto';
+import { Response} from 'express';
+
 
 @Controller('api/auth')
 export class AuthController {
@@ -18,10 +16,10 @@ export class AuthController {
 
   // 회원 가입 기능
   @Post('/signup')
-  async createUser(@Body() createUserDto: CreateUserDto): Promise<UserResponseDto> {
-    this.logger.verbose(`Visitor is try to creating a new board with title: ${createUserDto.email}`);
+  async createUser(@Body() signUpRequestDto: SignUpRequestDto): Promise<UserResponseDto> {
+    this.logger.verbose(`Visitor is try to creating a new board with title: ${signUpRequestDto.email}`);
 
-    const userResponseDto = new UserResponseDto(await this.authService.createUser(createUserDto));
+    const userResponseDto = new UserResponseDto(await this.authService.createUser(signUpRequestDto));
     
     this.logger.verbose(`New account email with ${userResponseDto.email} created Successfully`)
     return userResponseDto;
@@ -29,16 +27,16 @@ export class AuthController {
 
   // 로그인 기능
   @Post('/signin')
-  async signin(@Body() loginUserDto: LoginUserDto, @Res() res: Response): Promise<void> {
-    this.logger.verbose(`User with email: ${loginUserDto.email} is try to signing in`);
+  async signin(@Body() signInRequestDto: SignInRequestDto, @Res() res: Response): Promise<void> {
+    this.logger.verbose(`User with email: ${signInRequestDto.email} is try to signing in`);
 
-    const accessToken = await this.authService.signIn(loginUserDto, res);
+    const accessToken = await this.authService.signIn(signInRequestDto, res);
 
     // [2] JWT를 쿠키에 저장
     res.cookie('Authorization', accessToken);
 
     res.send({ message: "Login Success" });
-    this.logger.verbose(`User with email: ${loginUserDto.email} issued JWT ${accessToken}`);
+    this.logger.verbose(`User with email: ${signInRequestDto.email} issued JWT ${accessToken}`);
 
   }
 }

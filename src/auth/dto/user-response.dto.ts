@@ -1,5 +1,5 @@
-import { User } from "../entities/users.entity";
-import { UserRole } from "../users-role.enum";
+import { User } from "../entities/user.entity";
+import { UserRole } from "../user-role.enum";
 
 export class UserResponseDto {
     id: number;

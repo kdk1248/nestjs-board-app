@@ -1,11 +1,11 @@
 import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException, Res, UnauthorizedException } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
+import { SignUpRequestDto } from './dto/sign-up-request.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from './entities/users.entity';
+import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
-import { UserRole } from './users-role.enum';
+import { UserRole } from './user-role.enum';
 import * as bcrypt from 'bcryptjs';
-import { LoginUserDto } from './dto/login-user.dto';
+import { SignInRequestDto } from './dto/sign-in-request.dto';
 import { JwtService } from '@nestjs/jwt';
 import { Response } from 'express';
 
@@ -20,10 +20,10 @@ export class AuthService {
   ) { }
 
   // 회원 가입 기능
-  async createUser(createUserDto: CreateUserDto): Promise<User> {   //특수문자 x
-    this.logger.verbose(`Visitor is creating a new acount with title: ${createUserDto.email}`);
+  async createUser(signUpRequestDto: SignUpRequestDto): Promise<User> {   //특수문자 x
+    this.logger.verbose(`Visitor is creating a new acount with title: ${signUpRequestDto.email}`);
 
-    const { email, username, password, role } = createUserDto;
+    const { email, username, password, role } = signUpRequestDto;
     if (!email || !username || !password! || role) {
       throw new BadRequestException('Something went wrong.') //특정 필드 언급하지않도록 -> 보안의 중요성성
     }
@@ -48,10 +48,10 @@ export class AuthService {
   }
 
   //로그인 기능
-  async signIn(loginUserDto: LoginUserDto, @Res() res: Response): Promise<string> {
-    this.logger.verbose(`User with email: ${loginUserDto.email} is try to signing in`);
+  async signIn(signInRequestDto: SignInRequestDto, @Res() res: Response): Promise<string> {
+    this.logger.verbose(`User with email: ${signInRequestDto.email} is try to signing in`);
 
-    const { email, password } = loginUserDto;
+    const { email, password } = signInRequestDto;
     try {
       const existingUser = await this.checkEmailExist(email);
 
@@ -68,7 +68,7 @@ export class AuthService {
         role: existingUser.role
       };
       const accessToken = await this.jwtService.sign(payload);
-      this.logger.verbose(`User with email: ${loginUserDto.email} issued JWT ${accessToken}`);
+      this.logger.verbose(`User with email: ${signInRequestDto.email} issued JWT ${accessToken}`);
 
       return accessToken;
     } catch (error) {
