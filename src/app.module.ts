@@ -6,16 +6,18 @@ import { GlobalModule } from './global.module';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { UnauthorizedExceptionFilter } from './common/unauthorization.filter';
 import { LoggingInterceptor } from './interceptors/logging.interceptor';
+import { UserModule } from './user/user.module';
 @Module({
   imports: [
     GlobalModule,
     TypeOrmModule.forRoot(typeOrmConfig),
-    ArticleModule
+    ArticleModule,
+    UserModule
   ],
   providers:[
     {
       provide: APP_FILTER,
-      useClass: UnauthorizedExceptionFilter, //전액 필터 등록록
+      useClass: UnauthorizedExceptionFilter, 
     },
     {
       provide: APP_INTERCEPTOR,

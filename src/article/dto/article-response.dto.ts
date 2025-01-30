@@ -1,4 +1,4 @@
-import { User } from "src/auth/entities/user.entity";
+import { User } from "src/user/entities/user.entity";
 import { ArticleStatus } from "../article-status.enum";
 import { Article } from "../article.entity";
 
