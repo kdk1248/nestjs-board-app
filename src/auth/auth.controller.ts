@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Res, Logger } from '@nestjs/common';
+import { Controller, Post, Body, Res, Logger, HttpStatus } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignInRequestDto } from './dto/sign-in-request.dto';
 import { response, Response} from 'express';
@@ -24,7 +24,7 @@ export class AuthController {
 
     // [2] JWT를 헤더에 저장 후 ApiResponse를 바디에 담아서 전송 
     res.setHeader('Authorization', accessToken);
-    const response = new ApiResponseDto(true, 200, 'User logged in successfully', {accessToken})
+    const response = new ApiResponseDto(true, HttpStatus.OK, 'User logged in successfully', {accessToken})
 
     res.send(response);
   }

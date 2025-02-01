@@ -4,7 +4,6 @@ import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
-import { UserRole } from './entities/user-role.enum';
 
 @Injectable()
 export class UserService {
@@ -15,7 +14,7 @@ export class UserService {
   ) { }
 
   // CREATE
-  async createUser(createUserRequestDto: CreateUserRequestDto): Promise<User> {
+  async createUser(createUserRequestDto: CreateUserRequestDto): Promise<void> {
     this.logger.verbose(`Visitor is creating a new acount with title: ${createUserRequestDto.email}`);
 
     const { email, username, password, role } = createUserRequestDto;
@@ -31,13 +30,12 @@ export class UserService {
       email,
       username,
       password: hashedPassword,
-      role: UserRole.USER,
+      role,
     });
 
-    const createUser = await this.userRepository.save(newUser);
+    await this.userRepository.save(newUser);
 
-    this.logger.verbose(`New account email with ${createUser.email} created Successfully`)
-    return createUser;
+    this.logger.verbose(`New account email with ${newUser.email} created Successfully`)
   }
 
   //Existing Checker
