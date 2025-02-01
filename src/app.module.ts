@@ -4,9 +4,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeOrmConfig } from './configs/typeorm.config';
 import { GlobalModule } from './global.module';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
-import { UnauthorizedExceptionFilter } from './common/unauthorization.filter';
 import { LoggingInterceptor } from './interceptors/logging.interceptor';
 import { UserModule } from './user/user.module';
+import { UnauthorizedExceptionFilter } from './common/filters/unauthorization.filter';
 @Module({
   imports: [
     GlobalModule,

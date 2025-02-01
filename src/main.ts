@@ -1,8 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import * as cookieParser from 'cookie-parser';
-import { Logger, UnauthorizedException } from '@nestjs/common';
-import { UnauthorizedExceptionFilter } from './common/unauthorization.filter';
+import { Logger } from '@nestjs/common';
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   

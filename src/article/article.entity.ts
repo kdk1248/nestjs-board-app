@@ -1,13 +1,11 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { ArticleStatus } from './article-status.enum';
 import { User } from 'src/user/entities/user.entity';
+import { CommonEntity } from 'src/common/entites/common.entity';
 
 @Entity()
-export class Article {
-    @PrimaryGeneratedColumn() //PK + Auto Increment
-    id: number;
-
-    @Column() //General Column
+export class Article extends CommonEntity{
+    @Column() 
     author: string;
 
     @Column()
@@ -19,6 +17,6 @@ export class Article {
     @Column()
     status: ArticleStatus;
 
-    @ManyToOne(Type => User, user=>user.articles ,{eager: true}) // == lazy loading 상태태
+    @ManyToOne(Type => User, user=>user.articles ,{eager: true}) 
     user:User;
 }
