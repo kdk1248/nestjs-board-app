@@ -1,17 +1,17 @@
 import { Controller, Get, Param, Post, Query, Patch, Put, UsePipes, ValidationPipe, Body, Delete, UseGuards,Logger } from '@nestjs/common';
 import { ArticleService } from './article.service';
-import { Article } from './article.entity';
+import { Article } from './entities/article.entity';
 import { ArticleResponseDto } from './dto/article-response.dto';
 import { CreateArticleRequestDto } from './dto/create-article-request-dto';
 import { UpdateArticleRequestDto } from './dto/update-article-request-dto';
-import { ArticleStatusValidationPipe } from './pipes/article-stauts-validation.pipe';
-import { ArticleStatus } from './article-status.enum';
+import { ArticleStatusValidationPipe } from '../common/pipes/article-stauts-validation.pipe';
+import { ArticleStatus } from './entities/article-status.enum';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from 'src/auth/custom-role.guard';
 import { Roles } from 'src/auth/roles.decorator';
 import { GetUser } from 'src/auth/get-user.decorator';
 import { SearchArticleResponseDto } from './dto/search-article-response.dto';
-import { UserRole } from 'src/user/user-role.enum';
+import { UserRole } from 'src/user/entities/user-role.enum';
 import { User } from 'src/user/entities/user.entity';
 import { ApiResponseDto } from 'src/common/api-response-dto/api-response.dto';
 
