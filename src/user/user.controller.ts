@@ -5,7 +5,7 @@ import { UserResponseDto } from 'src/user/dto/user-response.dto';
 import { CreateUserRequestDto } from './dto/create-user-request.dto';
 import { ApiResponseDto } from 'src/common/api-response-dto/api-response.dto';
 
-@Controller('user')
+@Controller('api/user')
 export class UserController {
   private readonly logger = new Logger(UserController.name);
 

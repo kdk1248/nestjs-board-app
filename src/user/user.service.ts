@@ -16,9 +16,12 @@ export class UserService {
   // CREATE
   async createUser(createUserRequestDto: CreateUserRequestDto): Promise<void> {
     this.logger.verbose(`Visitor is creating a new acount with title: ${createUserRequestDto.email}`);
+    this.logger.verbose(`Visitor is creating a new acount with title: ${createUserRequestDto.role}`);
+    this.logger.verbose(`Visitor is creating a new acount with title: ${createUserRequestDto.username}`);
+    this.logger.verbose(`Visitor is creating a new acount with title: ${createUserRequestDto.password}`);
 
     const { email, username, password, role } = createUserRequestDto;
-    if (!email || !username || !password! || role) {
+    if (!email || !username || !password! || !role) {
       throw new BadRequestException('Something went wrong.') //특정 필드 언급하지않도록 -> 보안의 중요성성
     }
 
@@ -39,11 +42,11 @@ export class UserService {
   }
 
   //Existing Checker
-  async checkEmailExist(email: string): Promise<User> {
+  async checkEmailExist(email: string): Promise<void> {
     const exisitngUser = await this.userRepository.findOne({ where: { email } })
-    if (!exisitngUser) {
+    if (exisitngUser) {
       throw new ConflictException('Email already exists');
-    } return exisitngUser;
+    }
   }
 
   //Hasing Password
