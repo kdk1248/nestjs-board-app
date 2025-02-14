@@ -16,7 +16,7 @@ import { User } from 'src/user/entities/user.entity';
 import { ApiResponseDto } from 'src/common/api-response-dto/api-response.dto';
 
 @Controller('api/articles')
-// @UseGuards(AuthGuard(), RolesGuard)
+@UseGuards(AuthGuard(), RolesGuard)
 export class ArticleController {
     private readonly logger = new Logger(ArticleService.name);
 
@@ -38,7 +38,7 @@ export class ArticleController {
 
     // READ - all
     @Get('/')
-    // @Roles(UserRole.USER)//로그인 유저가 USER 만 접근 가능 
+    @Roles(UserRole.USER)//로그인 유저가 USER 만 접근 가능 
     async getAllArticles(): Promise<ApiResponseDto<ArticleResponseDto[]>> {
         this.logger.verbose(`Try to Retrieving all Articles`);
 
